@@ -1,2 +1,0 @@
-# attendance-management
-attendance management
