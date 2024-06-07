@@ -1,22 +1,19 @@
 <template>
   <div>
     <h1>Welcome to Nuxt with Keycloak</h1>
-    <template v-if="isLoading">
-      <p>Loading...</p>
-    </template>
-    <template v-else>
-      <p>Welcome, {{ keycloak.tokenParsed?.preferred_username }}</p>
-    </template>
+      <p>Welcome </p>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+</script>
+<!-- import { ref, onMounted } from 'vue';
 import { useNuxtApp } from '#imports';
 
 const isLoading = ref(true);
 const isAuthenticated = ref(false);
-const keycloak = ref(null);
+// const keycloak = ref(null);
+// const username = ref('');
 
 const initializeKeycloak = async () => {
   try {
@@ -24,9 +21,7 @@ const initializeKeycloak = async () => {
     if (!$keycloak) {
       throw new Error('Keycloak instance not found');
     }
-    keycloak.value = $keycloak;
-
-    console.log("Before checking if authenticated or not ",keycloak.value);
+    console.log("Before checking if authenticated or not ", $keycloak);
     // if (!keycloak.value.authenticated) {
     //   await keycloak.value.init({ onLoad: 'login-required' });
     // }
@@ -41,5 +36,4 @@ const initializeKeycloak = async () => {
 
 onMounted(async () => {
   await initializeKeycloak();
-});
-</script>
+}); -->

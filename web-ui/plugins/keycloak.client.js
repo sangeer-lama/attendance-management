@@ -25,9 +25,5 @@ export default defineNuxtPlugin((nuxtApp) => {
         console.error("Authentication Failed", error);
       });
   }
-  else{
-    return Promise.resolve(true);
-  }
-
   nuxtApp.provide('keycloak', keycloakInstance);
 });
