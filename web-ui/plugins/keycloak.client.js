@@ -1,23 +1,33 @@
-import Keycloak from 'keycloak-js'
+import Keycloak from 'keycloak-js';
+
+let keycloakInstance =null;
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig().public;
 
-  const keycloak = new Keycloak({
-    url: config.public.KEYCLOAK_URL,
-    realm: config.public.KEYCLOAK_REALM,
-    clientId: config.public.KEYCLOAK_CLIENT_ID
-  })
-  keycloak.init({ onLoad: 'login-required' }).then(authenticated => {
-    if (!authenticated) {
-      console.log("Not authenticated, reloading...")
-      window.location.reload()
-    } else {
-      console.log("Authenticated")
-      nuxtApp.provide('keycloak', keycloak)
-    }
-  }).catch(() => {
-    console.error("Authentication Failed")
-  })
-})
+  if (!keycloakInstance) {
+    keycloakInstance = new Keycloak({
+      url: config.KEYCLOAK_URL,
+      realm: config.KEYCLOAK_REALM,
+      clientId: config.KEYCLOAK_CLIENT_ID,
+    });
 
+    keycloakInstance.init({ onLoad: 'login-required' })
+      .then(authenticated => {
+        if (authenticated) {
+          console.log("Authenticated");
+        } else {
+          console.log("Not authenticated, reloading...");
+        }
+        return authenticated;
+      })
+      .catch(error => {
+        console.error("Authentication Failed", error);
+      });
+  }
+  else{
+    return Promise.resolve(true);
+  }
+
+  nuxtApp.provide('keycloak', keycloakInstance);
+});

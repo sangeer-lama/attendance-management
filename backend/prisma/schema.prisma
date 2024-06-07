@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "@prisma/client"
 }
 
 datasource db {
@@ -30,4 +31,13 @@ model user_attendance {
   day       Int
   attend_at DateTime?
   leave_at  DateTime?
+}
+
+generator repo {
+  provider = "prisma-repo"
+  output   = "./src/repository"
+  query    = true
+  warn     = true
+  info     = true
+  error    = true
 }

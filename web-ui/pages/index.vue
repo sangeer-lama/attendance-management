@@ -4,58 +4,42 @@
     <template v-if="isLoading">
       <p>Loading...</p>
     </template>
-    <template v-else-if="!isAuthenticated">
-      <p>Redirecting to login page...</p>
-    </template>
     <template v-else>
       <p>Welcome, {{ keycloak.tokenParsed?.preferred_username }}</p>
-      <!-- Your content after successful authentication -->
     </template>
   </div>
 </template>
 
 <script setup>
-import { useNuxtApp, onMounted, ref } from '#imports'
-import { nextTick } from 'vue';
-// import {keycloak}
+import { ref, onMounted } from 'vue';
+import { useNuxtApp } from '#imports';
 
-const { $keycloak, $axios } = useNuxtApp()
-
-const isLoading = ref(true)
-const isAuthenticated = ref(false)
-
-// onMounted(async () => {
-//   try {
-//     await nextTick();
-//     await $keycloak.init({ onLoad: 'login-required' })
-//     console.log("Keycloak initialized successfully")
-//     isAuthenticated.value = $keycloak.authenticated
-//     isLoading.value = false // Set loading state to false after initialization
-//   } catch (error) {
-//     console.error("Authentication Failed")
-//     console.log($keycloak);
-//     isLoading.value = false // Set loading state to false if initialization fails
-//   }
-// })
+const isLoading = ref(true);
+const isAuthenticated = ref(false);
+const keycloak = ref(null);
 
 const initializeKeycloak = async () => {
   try {
-    console.log("initializing keycloak")
-    console.log("keycloak check ----- ", $keycloak)
-    await $keycloak.init({ onLoad: 'login-required' })
-    console.log("Keycloak initialized successfully")
-    isAuthenticated.value = $keycloak.authenticated
-    console.log("isAuthentication", isAuthenticated)
-    isLoading.value = false // Set loading state to false after initialization
+    const { $keycloak } = useNuxtApp();
+    if (!$keycloak) {
+      throw new Error('Keycloak instance not found');
+    }
+    keycloak.value = $keycloak;
+
+    console.log("Before checking if authenticated or not ",keycloak.value);
+    // if (!keycloak.value.authenticated) {
+    //   await keycloak.value.init({ onLoad: 'login-required' });
+    // }
+    // isAuthenticated.value = keycloak.value.authenticated;
+    // console.log(isAuthenticated.value);
   } catch (error) {
-    console.error("Authentication Failed")
-    console.log($keycloak)
-    isLoading.value = false // Set loading state to false if initialization fails
+    console.error("Authentication Failed ------", error);
+  } finally {
+    isLoading.value = false;
   }
-}
+};
+
 onMounted(async () => {
-  const keycloak = $keycloak
-  console.log("Keycloak object:", keycloak)
-  await initializeKeycloak()
-})
+  await initializeKeycloak();
+});
 </script>

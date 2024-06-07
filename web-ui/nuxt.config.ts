@@ -2,19 +2,19 @@
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  ssr: false,
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost:4000', // Your API base URL
+      apiBase: process.env.API_BASE,
       KEYCLOAK_URL: process.env.KEYCLOAK_URL,
       KEYCLOAK_REALM: process.env.KEYCLOAK_REALM,
       KEYCLOAK_CLIENT_ID: process.env.KEYCLOAK_CLIENT_ID,
+      KEYCLOAK_CLIENT_SECRET: process.env.KEYCLOAK_CLIENT_SECRET,
     }
   },
-  plugins: [{
-    src: './plugins/keycloak.client.js', mode: 'client'
-  },
-  { src: './plugins/axios.js', mode: 'client' }],
-  // plugins : ['~/plugins/keycloak.client.js','~/plugins/axios.js']
+  plugins: [
+    { src: './plugins/keycloak.client.js', mode: 'client' },
+    { src: './plugins/axios.js', mode: 'client' }],
 })
 
 // auth: {
