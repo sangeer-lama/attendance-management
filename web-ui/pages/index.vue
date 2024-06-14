@@ -1,12 +1,20 @@
 <template>
   <div>
     <h1>Welcome to Nuxt with Keycloak</h1>
-      <p>Welcome </p>
+    <p>Welcome </p>
   </div>
 </template>
 
-<script setup>
-</script>
+<!-- import { useNuxtApp } from '#imports';
+const { $keycloak } = useNuxtApp();
+
+const router = useRouter()
+if ($keycloak.authenticated) {
+  console.log("check");
+  router.push('/user')
+} -->
+
+
 <!-- import { ref, onMounted } from 'vue';
 import { useNuxtApp } from '#imports';
 

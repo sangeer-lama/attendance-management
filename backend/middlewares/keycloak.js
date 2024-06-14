@@ -1,12 +1,14 @@
 const Keycloak = require("keycloak-connect");
-const dotenv = require('dotenv').config();
+const session = require('express-session');
+require('dotenv').config();
 
-const config = {
-  "realm": process.env.KEYCLOAK_REALM,
+const memoryStore = new session.MemoryStore();
+const keycloak = new Keycloak({store:memoryStore},{
+  realm: process.env.KEYCLOAK_REALM,
   "auth-server-url": `${process.env.KEYCLOAK_URL}`,
   "ssl-required": "external",
-  "resource": process.env.KEYCLOAK_CLIENT,
+  resource: process.env.KEYCLOAK_CLIENT,
   "bearer-only": true
-}
+});
 
-module.exports = new Keycloak({}, config);
+module.exports = keycloak;

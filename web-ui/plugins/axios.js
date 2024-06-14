@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { defineNuxtPlugin, useNuxtApp, useRuntimeConfig } from '#imports';
+import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig().public;

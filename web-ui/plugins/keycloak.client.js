@@ -4,6 +4,8 @@ let keycloakInstance =null;
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig().public;
+  const router = useRouter()
+
 
   if (!keycloakInstance) {
     keycloakInstance = new Keycloak({
@@ -16,8 +18,10 @@ export default defineNuxtPlugin((nuxtApp) => {
       .then(authenticated => {
         if (authenticated) {
           console.log("Authenticated");
+          router.push('/user')
         } else {
           console.log("Not authenticated, reloading...");
+          keycloakInstance.login();
         }
         return authenticated;
       })
