@@ -2,7 +2,7 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const session = require('express-session');
-const keycloak = require('#middlewares/keycloak');
+const keycloak = require('./middlewares/keycloak');
 const prismaGet = require('./middlewares/prisma_get');
 const prismaAuth = require('./middlewares/prisma_auth');
 const { PrismaClient } = require('@prisma/client');
@@ -36,17 +36,19 @@ app.use(async (req, res, next) => {
         // Check if the request has an Authorization header
         const token = req.headers.authorization;
         if (!token) {
+            console.log('No header');
             return res.status(401).json({ error: 'No header' });
         }
-
+        console.log('Token:', token);
         // Load user info from the token using PrismaAuth
         const userInfo = await prismaAuth.checkLogin(req);
-
+        console.log('User Info:', userInfo)
         // Attach user info to request object
         req.userInfo = userInfo;
         next();
     } catch (error) {
-        res.status(401).json({ error: 'Unauthorized' });
+        console.log('Error:', error);
+        res.status(401).json({ error: 'Unauthorized from server' });
     }
 });
 
@@ -64,8 +66,8 @@ app.use('/api/:model', async (req, res) => {
 });
 
 // Routes
-const testRoutes = require('#routes/test');
-const usersRoutes = require('#routes/users');
+const testRoutes = require('./routes/test');
+const usersRoutes = require('./routes/users');
 
 
 

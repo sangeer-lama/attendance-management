@@ -15,6 +15,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       config.headers.Authorization = `Bearer ${keycloak.token}`;
     }
     return config;
+  },error=>{
+    return Promise.reject(error);
   });
 
   // Provide axios instance globally
