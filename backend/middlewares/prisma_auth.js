@@ -56,23 +56,26 @@
 
 // module.exports = new PrismaAuth();
 
-
 const axios = require('axios');
 const https = require('https');
+const jwt_decode = require('jwt-decode');
 
 class PrismaAuth {
   constructor() {
     this.axiosInstance = axios.create({ httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
   }
 
-  async loadUserInfo(token, realm) {
-    const config = {
-      keycloakUrl: process.env.KEYCLOAK_URL
-    };
-
+  async loadUserInfo(token) {
     if (!token) {
       throw { error: 'Unauthorized' };
     }
+
+    const decodedToken = jwt_decode(token);
+    const realm = decodedToken.iss.split('/').pop(); // Extract realm from token issuer
+
+    const config = {
+      keycloakUrl: process.env.KEYCLOAK_URL,
+    };
 
     const url = `${config.keycloakUrl}/realms/${realm}/protocol/openid-connect/userinfo`;
     
@@ -84,11 +87,11 @@ class PrismaAuth {
     }
   }
 
-  async checkLogin(req, realm) {
+  async checkLogin(req) {
     const token = req.headers.authorization;
 
     if (token) {
-      return await this.loadUserInfo(token, realm);
+      return await this.loadUserInfo(token);
     }
 
     throw { error: 'No header' };
