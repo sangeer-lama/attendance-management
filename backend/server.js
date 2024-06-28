@@ -52,6 +52,24 @@ app.use(async (req, res, next) => {
     }
 });
 
+
+// New endpoint for token verification
+app.get('/verify-token', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const realm = req.query.realm || process.env.KEYCLOAK_REALM;
+        const userInfo = await prismaAuth.loadUserInfo(`Bearer ${token}`, realm);
+        if (userInfo) {
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(401);
+        }
+    } catch (error) {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+});
+
+
 // Dynamic route handling for Prisma operations
 app.use('/api/:model', async (req, res) => {
     try {

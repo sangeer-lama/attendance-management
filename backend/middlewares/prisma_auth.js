@@ -1,3 +1,62 @@
+// const axios = require('axios');
+// const https = require('https');
+
+// class PrismaAuth {
+//   constructor() {
+//     this.axiosInstance = axios.create({ httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
+//   }
+
+//   async loadUserInfo(token) {
+//     const config = {
+//       keycloakUrl: process.env.KEYCLOAK_URL,
+//       keycloakRealm: process.env.KEYCLOAK_REALM
+//     };
+
+//     if (!token) {
+//       throw { error: 'Unauthorized' };
+//     }
+
+//     const url = `${config.keycloakUrl}/realms/${config.keycloakRealm}/protocol/openid-connect/userinfo`;
+    
+//     try {
+//       const res = await this.axiosInstance.get(url, { headers: { Authorization: token } });
+//       return res.data;
+//     } catch (e) {
+//       throw { error: 'Unauthorized' };
+//     }
+//   }
+
+//   async checkLogin(req) {
+//     const token = req.headers.authorization;
+
+//     if (token) {
+//       return await this.loadUserInfo(token);
+//     }
+
+//     throw { error: 'No header' };
+//   }
+
+//   async addOwnerCondition(options, modelConfig, userinfo) {
+//     const result = { ...options };
+
+//     if (!result.where) {
+//       result.where = { AND: [{}] };
+//     } else {
+//       const where = result.where;
+//       result.where = { AND: [where] };
+//     }
+
+//     const conditions = userinfo.membership.map(m => ({ [modelConfig.owner_column]: m }));
+//     result.where.AND.push({ OR: conditions });
+
+//     result.where[modelConfig.owner_column] = userinfo.membership[0];
+//     return result;
+//   }
+// }
+
+// module.exports = new PrismaAuth();
+
+
 const axios = require('axios');
 const https = require('https');
 
@@ -6,17 +65,16 @@ class PrismaAuth {
     this.axiosInstance = axios.create({ httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
   }
 
-  async loadUserInfo(token) {
+  async loadUserInfo(token, realm) {
     const config = {
-      keycloakUrl: process.env.KEYCLOAK_URL,
-      keycloakRealm: process.env.KEYCLOAK_REALM
+      keycloakUrl: process.env.KEYCLOAK_URL
     };
 
     if (!token) {
       throw { error: 'Unauthorized' };
     }
 
-    const url = `${config.keycloakUrl}/realms/${config.keycloakRealm}/protocol/openid-connect/userinfo`;
+    const url = `${config.keycloakUrl}/realms/${realm}/protocol/openid-connect/userinfo`;
     
     try {
       const res = await this.axiosInstance.get(url, { headers: { Authorization: token } });
@@ -26,11 +84,11 @@ class PrismaAuth {
     }
   }
 
-  async checkLogin(req) {
+  async checkLogin(req, realm) {
     const token = req.headers.authorization;
 
     if (token) {
-      return await this.loadUserInfo(token);
+      return await this.loadUserInfo(token, realm);
     }
 
     throw { error: 'No header' };
