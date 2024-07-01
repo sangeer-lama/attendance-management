@@ -55,10 +55,8 @@
 // }
 
 // module.exports = new PrismaAuth();
-
 const axios = require('axios');
 const https = require('https');
-const jwt_decode = require('jwt-decode');
 
 class PrismaAuth {
   constructor() {
@@ -66,24 +64,22 @@ class PrismaAuth {
   }
 
   async loadUserInfo(token) {
-    if (!token) {
-      throw { error: 'Unauthorized' };
-    }
-
-    const decodedToken = jwt_decode(token);
-    const realm = decodedToken.iss.split('/').pop(); // Extract realm from token issuer
-
     const config = {
       keycloakUrl: process.env.KEYCLOAK_URL,
+      keycloakRealm: process.env.KEYCLOAK_REALM
     };
 
-    const url = `${config.keycloakUrl}/realms/${realm}/protocol/openid-connect/userinfo`;
+    if (!token) {
+      throw { error: 'token is empty ' };
+    }
+
+    const url = `${config.keycloakUrl}/realms/${config.keycloakRealm}/protocol/openid-connect/userinfo`;
     
     try {
       const res = await this.axiosInstance.get(url, { headers: { Authorization: token } });
       return res.data;
     } catch (e) {
-      throw { error: 'Unauthorized' };
+      throw { error: 'Unauthorized at loaduserinfo' };
     }
   }
 

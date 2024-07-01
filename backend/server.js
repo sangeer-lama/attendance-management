@@ -2,8 +2,6 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const session = require('express-session');
-const keycloak = require('./middlewares/keycloak');
-const prismaGet = require('./middlewares/prisma_get');
 const prismaAuth = require('./middlewares/prisma_auth');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
@@ -20,7 +18,6 @@ app.use(session({
     store: memoryStore,
 }));
 
-app.use(keycloak.middleware());
 app.use(express.json());
 app.use(cors());
 
@@ -33,17 +30,14 @@ const errorHandler = (error, req, res, next) => {
 // Middleware to authenticate and process request
 app.use(async (req, res, next) => {
     try {
-        // Check if the request has an Authorization header
         const token = req.headers.authorization;
         if (!token) {
             console.log('No header');
             return res.status(401).json({ error: 'No header' });
         }
         console.log('Token:', token);
-        // Load user info from the token using PrismaAuth
         const userInfo = await prismaAuth.checkLogin(req);
-        console.log('User Info:', userInfo)
-        // Attach user info to request object
+        console.log('User Info:', userInfo);
         req.userInfo = userInfo;
         next();
     } catch (error) {
@@ -52,23 +46,20 @@ app.use(async (req, res, next) => {
     }
 });
 
-
 // New endpoint for token verification
 app.get('/verify-token', async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const realm = req.query.realm || process.env.KEYCLOAK_REALM;
-        const userInfo = await prismaAuth.loadUserInfo(`Bearer ${token}`, realm);
+        const userInfo = await prismaAuth.loadUserInfo(`Bearer ${token}`);
         if (userInfo) {
             res.sendStatus(200);
         } else {
             res.sendStatus(401);
         }
     } catch (error) {
-        res.status(401).json({ error: 'Unauthorized' });
+        res.status(401).json({ error: 'verify token error' });
     }
 });
-
 
 // Dynamic route handling for Prisma operations
 app.use('/api/:model', async (req, res) => {
@@ -86,8 +77,6 @@ app.use('/api/:model', async (req, res) => {
 // Routes
 const testRoutes = require('./routes/test');
 const usersRoutes = require('./routes/users');
-
-
 
 // Register routes
 app.use('/api/test', testRoutes);
